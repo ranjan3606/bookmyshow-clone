@@ -1,12 +1,30 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MovieContext } from "../../context/Movie.context";
 import MovieInfo from "./MovieInfo.Component";
+import SeatSelection from "../SeatSelection/SeatSelection.Component";
 
 const MovieHero = () => {
-  const { movie, rentMoive, buyMoive } = useContext(MovieContext);
+  const { movie, rentMoive, buyMoive, setPrice, setIsOpen } = useContext(MovieContext);
   // const { movie } = useContext(MovieContext)
   const genres = movie.genres?.map(({ name }) => name).join(", ");
   // console.log(genres);
+
+  const [showSeatSelection, setShowSeatSelection] = useState(false);
+
+  // Function to handle the Buy button click
+  const handleBuyClick = () => {
+    setShowSeatSelection(true);
+  };
+
+  // Function to handle seat selection completion
+  const handleSeatSelection = (seatData) => {
+    // Set the price based on selected seats
+    setPrice(seatData.total);
+    // Close seat selection
+    setShowSeatSelection(false);
+    // Open payment modal
+    setIsOpen(true);
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -42,7 +60,7 @@ const MovieHero = () => {
               Rent ₹ 149
             </button>
             <button
-              onClick={buyMoive}
+              onClick={handleBuyClick}
               className="bg-red-600 w-full py-3 text-white font-semibold rounded-lg"
             >
               Buy ₹ 599
@@ -72,7 +90,7 @@ const MovieHero = () => {
                 />
               </div>
               <div className="">
-                <MovieInfo movie={movie} />
+                <MovieInfo movie={movie} handleBuyClick={handleBuyClick} />
               </div>
             </div>
             <img
@@ -83,6 +101,14 @@ const MovieHero = () => {
           </div>
         </div>
       </div>
+
+      {/* Seat Selection Modal */}
+      {showSeatSelection && (
+        <SeatSelection 
+          onSelectSeats={handleSeatSelection} 
+          onClose={() => setShowSeatSelection(false)} 
+        />
+      )}
     </>
   );
 };
